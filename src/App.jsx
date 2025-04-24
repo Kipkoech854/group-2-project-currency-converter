@@ -16,6 +16,7 @@ const currencies = [
 ];
 
 const App = () => {
+  console.log('Available currencies:', currencies);
   const [amount, setAmount] = useState(1);
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('EUR');
@@ -76,7 +77,10 @@ const App = () => {
               />
               <select
                 value={fromCurrency}
-                onChange={(e) => setFromCurrency(e.target.value)}
+                onChange={(e) => {
+                  console.log('Selected currency:', e.target.value);
+                  setFromCurrency(e.target.value);
+                }}
                 className='currency-dropdown'
               >
                 {currencies.map((currency) => (
