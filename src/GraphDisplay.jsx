@@ -4,6 +4,7 @@ import ChartData from './ChartData';
 function GraphDisplay() {
  return (
     <div>
+    
       <ChartData/>
     </div>
   )
