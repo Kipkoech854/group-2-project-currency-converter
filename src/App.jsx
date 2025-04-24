@@ -3,6 +3,7 @@ import './App.css';
 import GraphDisplay from './GraphDisplay';
 import chart from 'chart.js/auto';
 
+
 // Full list of 150+ currencies with symbols and flags
 const currencies = [
   { code: 'USD', name: 'US Dollar', symbol: '$' },
@@ -94,6 +95,8 @@ const App = () => {
     </div>
   );
 };
+
+// GraphDisplay.jsx
 
 export default App;
 
