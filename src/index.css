@@ -1,0 +1,131 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #064200;  /* Single solid color */
+}
+
+#root {
+  width: 100%;
+}
+
+.currency-converter {
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);  /* Lighter, more modern background */
+  padding: 50px 40px 60px;
+  border-radius: 16px;  /* More rounded corners */
+  max-width: 480px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.currency-converter .conveter-title {
+  color: #fff;
+  font-size: 2rem;  /* Larger title */
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.converter-form .form-group {
+  display: flex;
+  margin-bottom: 30px;
+  flex-direction: column;
+}
+
+.converter-form .form-group .form-label {
+  color: #fff;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 9px;
+  font-size: 1rem;
+}
+
+.converter-form .form-group .form-input {
+  outline: none;
+  font-size: 1.1rem;
+  padding: 15px;
+  color: #fff;
+  font-weight: 500;
+  min-height: 50px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.converter-form .form-group .form-input:focus {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.converter-form .form-currency-group {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-currency-group .currency-select {
+  padding: 12px 20px;
+  min-height: 50px;
+  min-width: 180px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.form-currency-group .currency-select:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.form-currency-group .currency-select .currency-dropdown {
+  outline: none;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0 10px 0 5px;
+  cursor: pointer;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.form-currency-group .currency-select::after {
+  content: '▼';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  font-size: 0.8rem;
+}
+
+.form-currency-group .currency-select .currency-dropdown option {
+  color: #333;
+  background: #fff;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.form-currency-group .currency-select:focus-within {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
