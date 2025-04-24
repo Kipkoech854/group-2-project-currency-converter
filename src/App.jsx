@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './App.css';
+import GraphDisplay from './GraphDisplay';
 
 // Full list of 150+ currencies with symbols and flags
 const currencies = [
@@ -16,7 +18,6 @@ const currencies = [
 ];
 
 const App = () => {
-  console.log('Available currencies:', currencies);
   const [amount, setAmount] = useState(1);
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('EUR');
@@ -78,7 +79,6 @@ const App = () => {
               <select
                 value={fromCurrency}
                 onChange={(e) => {
-                  console.log('Selected currency:', e.target.value);
                   setFromCurrency(e.target.value);
                 }}
                 className='currency-dropdown'
@@ -136,8 +136,10 @@ const App = () => {
           )}
         </div>
       </form>
+      <GraphDisplay />
     </div>
   );
 };
 
 export default App;
+
