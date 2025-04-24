@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import ConverterForm from './components/ConverterForm';
 import GraphDisplay from './GraphDisplay';
 
 // Full list of 150+ currencies with symbols and flags
@@ -42,4 +41,5 @@ const App = () => {
       }
     };
     fetchData();
-  }, [amount, fromCurrency
+  }, [amount, fromCurrency, toCurrency]);
+
