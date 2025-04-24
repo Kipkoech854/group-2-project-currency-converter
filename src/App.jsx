@@ -9,16 +9,21 @@ const App = () => {
   const [toCurrency, setToCurrency] = useState('EUR');
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // List of available currencies (this should ideally be fetched from an API or imported)
+
+  // Extended currency list with symbols (could be moved to a separate file or fetched)
   const currencies = [
-    { code: 'USD', name: 'United States Dollar' },
-    { code: 'EUR', name: 'Euro' },
-    { code: 'GBP', name: 'British Pound' },
-    // Add other currencies here
+    { code: 'USD', name: 'US Dollar', symbol: '$' },
+    { code: 'EUR', name: 'Euro', symbol: '€' },
+    { code: 'GBP', name: 'British Pound', symbol: '£' },
+    { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+    { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+    { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+    { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
+    { code: 'ZAR', name: 'South African Rand', symbol: 'R' }
   ];
 
-  // Fetch exchange rates
   useEffect(() => {
     const fetchData = async () => {
       if (!amount || amount <= 0) return;
