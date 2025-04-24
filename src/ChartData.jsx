@@ -47,6 +47,8 @@ function ChartData() {
           label: `Exchange Rate: ${baseCurrency} to ${targetCurrency}`,
           data,
           borderColor: 'rgba(231, 30, 91, 1)',
+          above: 'rgb(235, 94, 13)',
+          below: 'rgb(209, 155, 104)',
           borderWidth: 1,
           tension: 0.4,
           fill: false,
