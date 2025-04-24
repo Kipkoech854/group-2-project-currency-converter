@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './App.css';
+import GraphDisplay from './GraphDisplay';
 
 // Full list of 150+ currencies with symbols and flags
 const currencies = [
@@ -49,7 +51,7 @@ const App = () => {
 
   return (
     <div className='currency-converter'>
-      <h2 className='conveter-title'>Currency Converter</h2>
+      <h2 className='converter-title'>Currency Converter</h2>
       <form className='converter-form' onSubmit={(e) => e.preventDefault()}>
         <div className='form-group'>
           <label className='form-label'>Amount</label>
@@ -73,11 +75,10 @@ const App = () => {
                 alt={fromCurrency}
                 onError={(e) => e.target.src = 'https://flagcdn.com/48x36/un.png'}
               />
-              <select
-                value={fromCurrency}
-                onChange={(e) => setFromCurrency(e.target.value)}
-                className='currency-dropdown'
-              >
+             <select
+               value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}className='currency-dropdown'
+>
+
                 {currencies.map((currency) => (
                   <option key={currency.code} value={currency.code}>
                     {currency.code} - {currency.name}
@@ -131,8 +132,8 @@ const App = () => {
           )}
         </div>
       </form>
+      <GraphDisplay />
     </div>
   );
 };
-
 export default App;
