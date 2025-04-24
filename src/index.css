@@ -10,7 +10,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #030728;
+  background: #064200;  /* Single solid color */
 }
 
 #root {
@@ -19,20 +19,22 @@ body {
 
 .currency-converter {
   margin: 0 auto;
-  background: rgba(2, 7, 40, 0.5);
-  padding: 40px 30px 50px;
-  border-radius: 8px;
-  max-width: 410px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(30px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.1);  /* Lighter, more modern background */
+  padding: 50px 40px 60px;
+  border-radius: 16px;  /* More rounded corners */
+  max-width: 480px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
 .currency-converter .conveter-title {
   color: #fff;
-  font-size: 1.6rem;
-  font-weight: 600;
+  font-size: 2rem;  /* Larger title */
+  font-weight: 700;
   text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .converter-form .form-group {
@@ -52,13 +54,19 @@ body {
 .converter-form .form-group .form-input {
   outline: none;
   font-size: 1.1rem;
-  padding: 0.15px;
+  padding: 15px;
   color: #fff;
   font-weight: 500;
-  min-height: 48px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  min-height: 50px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.converter-form .form-group .form-input:focus {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .converter-form .form-currency-group {
@@ -68,17 +76,20 @@ body {
 }
 
 .form-currency-group .currency-select {
-  display: flex;
-  padding: 0 10px;
-  min-height: 45px;
-  align-items: center;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 12px 20px;
+  min-height: 50px;
+  min-width: 180px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
 }
 
-.form-currency-group .currency-select img {
-  width: 25px;
+.form-currency-group .currency-select:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .form-currency-group .currency-select .currency-dropdown {
@@ -89,56 +100,32 @@ body {
   font-size: 1rem;
   font-weight: 500;
   padding: 0 10px 0 5px;
+  cursor: pointer;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.form-currency-group .currency-select::after {
+  content: '▼';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  font-size: 0.8rem;
 }
 
 .form-currency-group .currency-select .currency-dropdown option {
-  color: #fff;
+  color: #333;
+  background: #fff;
   font-weight: 500;
+  padding: 10px;
 }
 
-.form-currency-group .swap-icon {
-  height: 40px;
-  width: 40px;
-  cursor: pointer;
-  margin-top: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  transition: 0.2s ease;
-}
-
-.form-currency-group .swap-icon:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.converter-form .submit-button {
-  width: 100%;
-  min-height: 52px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.converter-form .submit-button:hover {
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.converter-form .exchange-rate-results {
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 500;
-  text-align: center;
-  padding: 25px 0;
-  margin-top: 30px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.15);
-
+.form-currency-group .currency-select:focus-within {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }

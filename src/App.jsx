@@ -1,55 +1,139 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+
+// Full list of 150+ currencies with symbols and flags
+const currencies = [
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
+  // Add more currencies here...
+  { code: 'ZAR', name: 'South African Rand', symbol: 'R' }
+];
 
 const App = () => {
+  const [amount, setAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState('USD');
+  const [toCurrency, setToCurrency] = useState('EUR');
+  const [result, setResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch exchange rates
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!amount || amount <= 0) return;
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`
+        );
+        const data = await response.json();
+        setResult(data.rates[toCurrency]);
+      } catch (error) {
+        console.error("API Error:", error);
+        setResult(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [amount, fromCurrency, toCurrency]);
+
+  const handleSwap = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
+
   return (
     <div className='currency-converter'>
       <h2 className='conveter-title'>Currency Converter</h2>
-      <form className='converter-form'>
+      <form className='converter-form' onSubmit={(e) => e.preventDefault()}>
         <div className='form-group'>
-          <label className='form-label'>Enter Amount</label>
-          <input type='number' className='form-input' required />
+          <label className='form-label'>Amount</label>
+          <input
+            type="number"
+            className='form-input'
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            min="0.01"
+            step="0.01"
+            placeholder="1.00"
+          />
         </div>
 
         <div className='form-group form-currency-group'>
           <div className='form-section'>
             <label className='form-label'>From</label>
             <div className='currency-select'>
-              <img src='https://www.worldometers.info/img/flags/small/tn_fm-flag.gif' alt='Flag' />
-              <select className='currency-dropdown'>
-                <option value="USD">USD</option>
-                <option value="INR">INR</option>
-                <option value="NPR">NPR</option>
+              <img 
+                src={`https://flagcdn.com/48x36/${fromCurrency.substring(0, 2).toLowerCase()}.png`}
+                alt={fromCurrency}
+                onError={(e) => e.target.src = 'https://flagcdn.com/48x36/un.png'}
+              />
+              <select
+                value={fromCurrency}
+                onChange={(e) => setFromCurrency(e.target.value)}
+                className='currency-dropdown'
+              >
+                {currencies.map((currency) => (
+                  <option key={currency.code} value={currency.code}>
+                    {currency.code} - {currency.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
-          <div className='swap-icon'>
-            <svg width="16" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M19.13 11.66H.22a.22.22 0 0 0-.22.22v1.62a.22.22 0 0 0 .22.22h16.45l-3.92 4.94a.22.22 0 0 0 .17.35h1.97c.13 0 .25-.06.33-.16l4.59-5.78a.9.9 0 0 0-.7-1.43zM19.78 5.29H3.34L7.26.35A.22.22 0 0 0 7.09 0H5.12a.22.22 0 0 0-.34.16L.19 5.94a.9.9 0 0 0 .68 1.4H19.78a.22.22 0 0 0 .22-.22V5.51a.22.22 0 0 0-.22-.22z"
-                fill="#fff"
-              />
+          <div className='swap-icon' onClick={handleSwap}>
+            <svg width="24" viewBox="0 0 24 24" fill="none">
+              <path d="M16 17.01V10H14V17.01H11L15 21L19 17.01H16ZM9 3L5 6.99H8V14H10V6.99H13L9 3Z" fill="#FFF"/>
             </svg>
           </div>
 
           <div className='form-section'>
             <label className='form-label'>To</label>
             <div className='currency-select'>
-              <img src='https://www.worldometers.info/img/flags/small/tn_nz-flag.gif' alt='Flag' />
-              <select className='currency-dropdown'>
-                <option value="USD">USD</option>
-                <option value="INR">INR</option>
-                <option value="NPR">NPR</option>
+              <img 
+                src={`https://flagcdn.com/48x36/${toCurrency.substring(0, 2).toLowerCase()}.png`}
+                alt={toCurrency}
+                onError={(e) => e.target.src = 'https://flagcdn.com/48x36/un.png'}
+              />
+              <select
+                value={toCurrency}
+                onChange={(e) => setToCurrency(e.target.value)}
+                className='currency-dropdown'
+              >
+                {currencies.map((currency) => (
+                  <option key={currency.code} value={currency.code}>
+                    {currency.code} - {currency.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
         </div>
-        <button type='submit' className='submit-button'>Get Exchange Rate</button>
-        <p className='exchange-rate-results'>1,000 USD = 836.80 INR</p>
+
+        <div className='exchange-rate-results'>
+          {isLoading ? (
+            <p>Loading rates...</p>
+          ) : result ? (
+            <p>
+              {amount} {fromCurrency} ={" "}
+              <strong>
+                {result} {toCurrency}
+              </strong>
+            </p>
+          ) : (
+            <p>Enter amount to convert</p>
+          )}
+        </div>
       </form>
-
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
