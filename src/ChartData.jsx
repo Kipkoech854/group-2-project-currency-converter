@@ -1,99 +1,139 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import CurrencyDropdowns from './CurrencyDropDowns';
-import {fetchHistoricalRates} from './GetRates.jsx';
+import './App.css';
 
-function ChartData() {
-  const [historicalRates, setHistoricalRates] = useState([]);
+function ChartData({ historicalRates, isLoading }) {
   const [baseCurrency, setBaseCurrency] = useState('USD');
   const [targetCurrency, setTargetCurrency] = useState('EUR');
-  const [availableCurrencies, setAvailableCurrencies] = useState([]);
+  const [selectedRange, setSelectedRange] = useState('14'); // default 14 days
+
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
 
   useEffect(() => {
-    const fetchAvailableCurrencies = async () => {
-      try {
-        const response = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_mfLM9nmOX7tTQb4sTn3AH7e3CYfgw7TQUDGQQkR7`);
-        const data = await response.json();
-        setAvailableCurrencies(Object.keys(data.data));
-      } catch (error) {
-        console.error('Error fetching currencies:', error);
-      }
-    };
+    if (!historicalRates.length || isLoading) return;
 
-    fetchAvailableCurrencies();
-  }, []);
+    let filteredRates = [...historicalRates];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const results = await fetchHistoricalRates(baseCurrency);
-      setHistoricalRates(results);
-    };
+    if (selectedRange !== 'all') {
+      const days = parseInt(selectedRange, 10);
+      filteredRates = historicalRates.slice(-days);
+    }
 
-    fetchData();
-  }, [baseCurrency]);
+    const validData = filteredRates.filter(entry =>
+      entry.rates?.[baseCurrency] && entry.rates?.[targetCurrency]
+    );
 
-  useEffect(() => {
-    if (historicalRates.length === 0 || !targetCurrency) return;
+    if (validData.length === 0) return;
 
-    const labels = historicalRates.map(entry => entry.date);
-    const data = historicalRates.map(entry => entry.rates[targetCurrency]);
+    const labels = validData.map(entry => entry.date);
+    const data = validData.map(entry => {
+      const baseRate = entry.rates[baseCurrency];
+      const targetRate = entry.rates[targetCurrency];
+      return targetRate / baseRate;
+    });
 
     const chartData = {
       labels,
-      datasets: [
-        {
-          label: `Exchange Rate: ${baseCurrency} to ${targetCurrency}`,
-          data,
-          borderColor: 'rgba(231, 30, 91, 1)',
-          borderWidth: 1,
-          tension: 0.4,
-          fill: false,
-        },
-      ],
+      datasets: [{
+        label: `1 ${baseCurrency} to ${targetCurrency}`,
+        data,
+        borderColor: 'rgba(231, 30, 91, 1)',
+        backgroundColor: 'rgba(231, 30, 91, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
+      }],
     };
 
     const chartOptions = {
       responsive: true,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: context => `1 ${baseCurrency} = ${context.parsed.y.toFixed(4)} ${targetCurrency}`
+          }
+        },
+      },
       scales: {
         y: {
-          title: {
-            display: true,
-            text: 'Exchange Rate',
-          },
+          title: { display: true, text: 'Exchange Rate' },
         },
         x: {
-          title: {
-            display: true,
-            text: 'Date',
-          },
+          title: { display: true, text: 'Date' },
         },
       },
     };
+
+    const ctx = chartRef.current?.getContext('2d');
+    if (!ctx) return;
 
     if (chartInstanceRef.current) {
       chartInstanceRef.current.destroy();
     }
 
-    const ctx = chartRef.current.getContext('2d');
     chartInstanceRef.current = new Chart(ctx, {
       type: 'line',
       data: chartData,
       options: chartOptions,
     });
-  }, [historicalRates, baseCurrency, targetCurrency]);
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
+    };
+  }, [historicalRates, baseCurrency, targetCurrency, selectedRange, isLoading]);
+
+  if (isLoading) return <p>Loading chart...</p>;
+  if (!historicalRates.length) return <p>No data to display</p>;
 
   return (
-    <div>
+    <div className="chart-container">
+      <div className="button-container">
+  {[
+    { range: '14', label: '2 Weeks', color: '#2196F3' },    
+    { range: '30', label: '1 Month', color: '#4CAF50' },     
+    { range: '60', label: '2 Months', color: '#FF9800' },   
+    { range: '90', label: '3 Months', color: '#9C27B0' },    
+    { range: '180', label: '6 Months', color: '#F44336' },   
+    { range: '365', label: '1 Year', color: '#607D8B' },     
+        
+  ].map(({ range, label, color }) => (
+    <button
+      key={range}
+      className={`button ${selectedRange === range ? 'active' : ''}`}
+      onClick={() => setSelectedRange(range)}
+      style={{
+        backgroundColor: selectedRange === range ? color : '#f0f0f0',
+        color: selectedRange === range ? 'white' : '#333',
+        border: `1px solid ${selectedRange === range ? color : '#ccc'}`,
+        padding: '8px 16px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        margin: '0 4px',
+        transition: 'all 0.3s ease'
+      }}
+    >
+      {label}
+    </button>
+  ))}
+</div>
+      
       <CurrencyDropdowns
-        availableCurrencies={availableCurrencies}
+        availableCurrencies={Object.keys(historicalRates[0]?.rates || {})}
         baseCurrency={baseCurrency}
         targetCurrency={targetCurrency}
         setBaseCurrency={setBaseCurrency}
         setTargetCurrency={setTargetCurrency}
       />
-      <canvas ref={chartRef} id="exchangeRateChart"></canvas>
+
+            <canvas
+        ref={chartRef}
+        id="exchangeRateChart"
+        aria-label="Exchange Rate Chart"
+      />
     </div>
   );
 }
