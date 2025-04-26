@@ -1,42 +1,220 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #030728;
+}
+
 #root {
-  max-width: 1280px;
+  width: 100%;
+}
+
+.currency-converter {
   margin: 0 auto;
-  padding: 2rem;
+  background: rgba(2, 7, 40, 0.5);
+  padding: 40px 30px 50px;
+  border-radius: 8px;
+  max-width: 410px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(30px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.currency-converter .conveter-title {
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 600;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.converter-form .form-group {
+  display: flex;
+  margin-bottom: 30px;
+  flex-direction: column;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.converter-form .form-group .form-label {
+  color: #fff;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 9px;
+  font-size: 1rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.converter-form .form-group .form-input {
+  outline: none;
+  font-size: 1.1rem;
+  padding: 0.15px;
+  color: #fff;
+  font-weight: 500;
+  min-height: 48px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.card {
-  padding: 2em;
+.converter-form .form-currency-group {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.read-the-docs {
-  color: #888;
+.form-currency-group .currency-select {
+  display: flex;
+  padding: 0 10px;
+  min-height: 45px;
+  align-items: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.form-currency-group .currency-select img {
+  width: 25px;
+}
+
+.form-currency-group .currency-select .currency-dropdown {
+  outline: none;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0 10px 0 5px;
+}
+
+.form-currency-group .currency-select .currency-dropdown option {
+  color: #000;
+  font-weight: 500;
+}
+
+.form-currency-group .swap-icon {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: 0.2s ease;
+}
+
+.form-currency-group .swap-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.converter-form .submit-button {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.converter-form .submit-button.loading {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.converter-form .submit-button:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.converter-form .exchange-rate-results {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 25px 0;
+  margin-top: 30px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.favorite-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.8rem;
+  color: gold;
+  margin-left: 10px;
+  margin-top: 20px;
+  transition: 0.2s ease;
+}
+
+.favorite-button:hover {
+  transform: scale(1.2);
+}
+
+.favorites-page {
+  margin-top: 40px;
+  text-align: center;
+  color: white;
+}
+
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.favorites-list {
+  list-style: none;
+  padding: 0;
+  margin-left: 30px;
+}
+
+.favorite-item {
+  background: rgba(255, 255, 255, 0.15);
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 300px;
+  font-size: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  transition: color 0.3 ease;
+}
+
+.favorite-item:hover {
+  background-color: #f0f8ff;
+  color: #030728;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.delete-button:hover {
+  color: darkred;
+  transform: scale(1.2);
+}
+
+.history-chart-container {
+  margin-top: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 8px;
 }
