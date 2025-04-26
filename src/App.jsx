@@ -3,8 +3,6 @@ import './App.css';
 import GraphDisplay from './GraphDisplay';
 import chart from 'chart.js/auto';
 
-
-// Full list of 150+ currencies with symbols and flags
 const currencies = [
   { code: 'USD', name: 'US Dollar', symbol: '$' },
   { code: 'EUR', name: 'Euro', symbol: '€' },
@@ -26,6 +24,17 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [history, setHistory] = useState(() => {
+    const saved = localStorage.getItem('conversionHistory');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showHistory, setShowHistory] = useState(false); 
+
+function toggleHistory() {
+  setShowHistory(prev => !prev);
+}
+
+
   useEffect(() => {
     const fetchData = async () => {
       if (!amount || amount <= 0) return;
@@ -39,7 +48,20 @@ const App = () => {
           throw new Error('Failed to fetch exchange rate');
         }
         const data = await response.json();
-        setResult(data.rates[toCurrency]);
+        const convertedAmount = data.rates[toCurrency];
+        setResult(convertedAmount);
+
+        const newEntry = {
+          timestamp: new Date().toISOString(),
+          amount,
+          from: fromCurrency,
+          to: toCurrency,
+          result: convertedAmount,
+        };
+
+        const updatedHistory = [newEntry, ...history].slice(0, 20);
+        setHistory(updatedHistory);
+        localStorage.setItem('conversionHistory', JSON.stringify(updatedHistory));
       } catch (error) {
         console.error("API Error:", error);
         setError(error.message);
@@ -49,13 +71,20 @@ const App = () => {
       }
     };
 
-    // Add debouncing to prevent too many API calls
     const timeoutId = setTimeout(() => {
       fetchData();
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [amount, fromCurrency, toCurrency]);
+
+  const handleClearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('conversionHistory');
+  };
+  function toggleHistory() {
+    setShowHistory(prev => !prev);
+  }
 
   return (
     <div className="App">
@@ -88,15 +117,46 @@ const App = () => {
           ))}
         </select>
       </div>
+
       {isLoading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {result && <h2>Result: {result} {toCurrency}</h2>}
+      <div className="history-section">
+  <button
+    onClick={toggleHistory}
+    className={`history-toggle-button ${showHistory ? 'active' : ''}`}
+  >
+    {showHistory ? 'Hide History' : 'Show History'}
+  </button>
+
+  {showHistory && (
+    <>
+      <h3>Recent Conversions</h3>
+      {history.length > 0 ? (
+        <>
+          <ul>
+            {history.map((entry, index) => (
+              <li key={index}>
+                {entry.amount} {entry.from} → {entry.result} {entry.to}
+                <br />
+                <small>{new Date(entry.timestamp).toLocaleString()}</small>
+              </li>
+            ))}
+          </ul>
+          <button onClick={handleClearHistory}>Clear History</button>
+        </>
+      ) : (
+        <p>No conversion history yet.</p>
+      )}
+    </>
+  )}
+</div>
+
       <GraphDisplay />
+      
+      
     </div>
   );
 };
 
-// GraphDisplay.jsx
-
 export default App;
-

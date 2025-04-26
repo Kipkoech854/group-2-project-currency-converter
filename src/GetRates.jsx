@@ -1,31 +1,45 @@
-const API_KEY = 'fca_live_mfLM9nmOX7tTQb4sTn3AH7e3CYfgw7TQUDGQQkR7';
+import React, { useState, useEffect } from 'react';
 
-export const getLast14Dates = () => {
+export const fetchHistoricalRates = async (baseCurrency, days, setHistoricalRates) => {
+  const appId = '77676428db81415db0022d7c5e1bdfe4';
+  const baseURL = 'https://openexchangerates.org/api/';
+
+  const today = new Date();
   const dates = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
-  return dates;
-};
 
-export const fetchExchangeRateForDate = async (date, baseCurrency) => {
+  // Generate list of past N dates
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const formattedDate = d.toISOString().split('T')[0]; // YYYY-MM-DD
+    dates.push(formattedDate);
+  }
+
   try {
-    const response = await fetch(
-      `https://api.freecurrencyapi.com/v1/historical?apikey=${API_KEY}&date=${date}&base_currency=${baseCurrency}`
-    );
-    const data = await response.json();
-    return { date, rates: data.data[date] };
-  } catch (error) {
-    console.error(`Error fetching data for ${date}:`, error);
-    return null;
-  }
-};
+    // Fetch all rates in parallel
+    const fetchPromises = dates.map(async (date) => {
+      let url = `${baseURL}historical/${date}.json?app_id=${appId}`;
 
-export const fetchHistoricalRates = async (baseCurrency) => {
-  const dates = getLast14Dates();
-  const promises = dates.map(date => fetchExchangeRateForDate(date, baseCurrency));
-  const results = await Promise.all(promises);
-  return results.filter(res => res !== null);
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Error fetching data for ${date}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.rates) {
+        console.error(`No rates found for ${date}.`);
+        return { date, rates: {} };
+      }
+
+      return { date, rates: data.rates };
+    });
+
+    const results = await Promise.all(fetchPromises);
+
+    setHistoricalRates(results.reverse()); // Store results in state (from oldest to newest)
+  } catch (error) {
+    console.error('Error fetching historical rates:', error);
+  }
 };

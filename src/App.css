@@ -40,3 +40,80 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.button-container {
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+
+.button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+
+.button-default {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+
+.button-active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+
+.button:hover {
+  background-color: #ddd;
+}
+
+
+.button-active-14 {
+  background-color: #2196F3;
+  color: white;
+}
+
+.button-active-21 {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.button-active-30 {
+  background-color: #9C27B0;
+  color: white;
+}
+.history-section {
+  position: relative;
+  padding: 1rem;
+}
+
+/* Button styling */
+.history-toggle-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #3b82f6; /* blue-500 */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* When active (history shown) */
+.history-toggle-button.active {
+  background-color: white;
+  color: #3b82f6; /* blue-500 */
+  border: 2px solid #3b82f6;
+}
+
+
