@@ -1,31 +1,43 @@
-const API_KEY = 'fca_live_mfLM9nmOX7tTQb4sTn3AH7e3CYfgw7TQUDGQQkR7';
-
-export const getLast14Dates = () => {
+export const fetchHistoricalRates = async (days, existingRates = []) => {
+  const appId = '77676428db81415db0022d7c5e1bdfe4';
+  const baseURL = 'https://openexchangerates.org/api/';
+  
+  const today = new Date();
   const dates = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
-  return dates;
-};
 
-export const fetchExchangeRateForDate = async (date, baseCurrency) => {
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const formattedDate = d.toISOString().split('T')[0]; // YYYY-MM-DD
+    dates.push(formattedDate);
+  }
+
+  const existingDates = existingRates.map((entry) => entry.date);
+  const missingDates = dates.filter(date => !existingDates.includes(date));
+
+  if (missingDates.length === 0) {
+    return existingRates; 
+  }
+
   try {
-    const response = await fetch(
-      `https://api.freecurrencyapi.com/v1/historical?apikey=${API_KEY}&date=${date}&base_currency=${baseCurrency}`
-    );
-    const data = await response.json();
-    return { date, rates: data.data[date] };
-  } catch (error) {
-    console.error(`Error fetching data for ${date}:`, error);
-    return null;
-  }
-};
+    const fetchPromises = missingDates.map(async (date) => {
+      const url = `${baseURL}historical/${date}.json?app_id=${appId}`;
+      const response = await fetch(url);
 
-export const fetchHistoricalRates = async (baseCurrency) => {
-  const dates = getLast14Dates();
-  const promises = dates.map(date => fetchExchangeRateForDate(date, baseCurrency));
-  const results = await Promise.all(promises);
-  return results.filter(res => res !== null);
+      if (!response.ok) {
+        throw new Error(`Error fetching data for ${date}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return { date, rates: data.rates || {} };
+    });
+
+    const missingResults = await Promise.all(fetchPromises);
+    const allRates = [...existingRates, ...missingResults].reverse();
+
+    return allRates;
+  } catch (error) {
+    console.error('Error fetching historical rates:', error);
+    throw error;
+  }
 };

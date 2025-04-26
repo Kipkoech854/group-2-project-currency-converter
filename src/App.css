@@ -35,6 +35,7 @@ body {
   text-align: center;
 }
 
+/* Form styles */
 .converter-form .form-group {
   display: flex;
   margin-bottom: 30px;
@@ -114,6 +115,107 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* Button styles */
+.button-container {
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.button-default {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.button-active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.button:hover {
+  background-color: #ddd;
+}
+
+.button-active-14 {
+  background-color: #2196F3;
+  color: white;
+}
+
+.button-active-21 {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.button-active-30 {
+  background-color: #9C27B0;
+  color: white;
+}
+
+/* Period buttons */
+.period-button-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.period-button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.period-button:hover {
+  background-color: #f0f0f0;
+}
+
+.period-button.active {
+  background-color: #e71e5b;
+  color: white;
+  border-color: #e71e5b;
+}
+
+/* History section */
+.history-section {
+  position: relative;
+  padding: 1rem;
+}
+
+.history-toggle-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.history-toggle-button.active {
+  background-color: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+}
+
+/* Submit button */
 .converter-form .submit-button {
   width: 100%;
   min-height: 52px;
@@ -135,6 +237,7 @@ body {
   background: rgba(255, 255, 255, 0.8);
 }
 
+/* Results */
 .converter-form .exchange-rate-results {
   color: #fff;
   font-size: 1.1rem;
@@ -147,6 +250,7 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Favorites */
 .favorite-button {
   background: none;
   border: none;
@@ -212,9 +316,49 @@ body {
   transform: scale(1.2);
 }
 
+/* Chart */
 .history-chart-container {
   margin-top: 40px;
   background: rgba(255, 255, 255, 0.1);
   padding: 20px;
   border-radius: 8px;
+}
+
+/* Period dropdown */
+.period-dropdown {
+  position: relative;
+}
+
+.period-button {
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.period-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1;
+}
+
+.period-option {
+  padding: 10px;
+  background-color: white;
+  color: black;
+  border: none;
+  cursor: pointer;
+}
+
+.period-option:hover {
+  background-color: #f1f1f1;
+}
+
+.period-option.active {
+  background-color: #4CAF50;
+  color: white;
 }
