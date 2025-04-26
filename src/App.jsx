@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import ChartData from './ChartData';
 import { fetchHistoricalRates } from './GetRates';
 import { checkAndFetchDaily } from './DailyUpdater';
 import PeriodDropdown from './PeriodDropdown';
+import HistoryGraphPage from './HistoryGraphPage';
+import FavoritesPage from './FavouritesPage';
+import ConverterForm from './components/ConverterForm'; // Assuming you want the converter form as a separate component
 
 const App = () => {
-  const [amount, setAmount] = useState();  // Default value is 1
+  const [amount, setAmount] = useState(1);  // Default value is 1
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('EUR');
   const [result, setResult] = useState(null);
@@ -128,72 +132,81 @@ const App = () => {
   };
 
   return (
-    <div className="App">
-      <h1>Currency Converter</h1>
+    <Router>
+      <div className="App">
+        <h1>Currency Converter</h1>
 
-      <div className="converter">
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-          min="0"
-          step="any"
-        />
-        <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
-          {availableCurrencies.map(currency => (
-            <option key={currency} value={currency}>{currency}</option>
-          ))}
-        </select>
-        <span> to </span>
-        <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)}>
-          {availableCurrencies.map(currency => (
-            <option key={currency} value={currency}>{currency}</option>
-          ))}
-        </select>
-        <button onClick={handleConversion} className="convert-button">
-          Convert
-        </button>
-      </div>
-
-      {isLoading && <p>Loading conversion...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {result && <h2>Result: {result.toFixed(4)} {toCurrency}</h2>}
-
-      <div className="history-section">
-        <button onClick={toggleHistory} className={`history-toggle-button ${showHistory ? 'active' : ''}`}>
-          {showHistory ? 'Hide History' : 'Show History'}
-        </button>
-
-        {showHistory && (
-          <>
-            <h3>Recent Conversions</h3>
-            {history.length > 0 ? (
-              <ul>
-                {history.map((entry, index) => (
-                  <li key={index}>
-                    {entry.amount} {entry.from} → {entry.result.toFixed(4)} {entry.to}
-                    <br />
-                    <small>{new Date(entry.timestamp).toLocaleString()}</small>
-                  </li>
+        <Routes>
+          {/* Route for the Converter Form */}
+          <Route path="/" element={
+            <div className="converter">
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                min="0"
+                step="any"
+              />
+              <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
+                {availableCurrencies.map(currency => (
+                  <option key={currency} value={currency}>{currency}</option>
                 ))}
-              </ul>
-            ) : (
-              <p>No conversion history yet.</p>
-            )}
-            <button onClick={handleClearHistory} className="clear-history-button">
-              Clear History
-            </button>
-          </>
-        )}
+              </select>
+              <span> to </span>
+              <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)}>
+                {availableCurrencies.map(currency => (
+                  <option key={currency} value={currency}>{currency}</option>
+                ))}
+              </select>
+              <button onClick={handleConversion} className="convert-button">
+                Convert
+              </button>
+
+              {isLoading && <p>Loading conversion...</p>}
+              {error && <p style={{ color: 'red' }}>{error}</p>}
+              {result && <h2>Result: {result.toFixed(4)} {toCurrency}</h2>}
+            </div>
+          } />
+          
+          {/* Route for the History Graph Page */}
+          <Route path="/history" element={<HistoryGraphPage />} />
+
+          {/* Route for the Favorites Page */}
+          <Route path="/favorites" element={<FavoritesPage />} />
+        </Routes>
+
+        <div className="history-section">
+          <button onClick={toggleHistory} className={`history-toggle-button ${showHistory ? 'active' : ''}`}>
+            {showHistory ? 'Hide History' : 'Show History'}
+          </button>
+
+          {showHistory && (
+            <>
+              <h3>Recent Conversions</h3>
+              {history.length > 0 ? (
+                <ul>
+                  {history.map((entry, index) => (
+                    <li key={index}>
+                      {entry.amount} {entry.from} → {entry.result.toFixed(4)} {entry.to}
+                      <br />
+                      <small>{new Date(entry.timestamp).toLocaleString()}</small>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No conversion history yet.</p>
+              )}
+              <button onClick={handleClearHistory} className="clear-history-button">
+                Clear History
+              </button>
+            </>
+          )}
+        </div>
+
+        <PeriodDropdown historicalRates={historicalRates} onSelectPeriod={handlePeriodSelection} />
+        <ChartData historicalRates={historicalRates} isLoading={chartLoading} />
       </div>
-
-      <PeriodDropdown historicalRates={historicalRates} onSelectPeriod={handlePeriodSelection} />
-
-      <ChartData 
-        historicalRates={historicalRates}
-        isLoading={chartLoading}
-      />
-    </div>
+    </Router>
   );
 };
 
