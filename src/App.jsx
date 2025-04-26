@@ -1,160 +1,198 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-import GraphDisplay from './GraphDisplay';
-import chart from 'chart.js/auto';
-
-const currencies = [
-  { code: 'USD', name: 'US Dollar', symbol: '$' },
-  { code: 'EUR', name: 'Euro', symbol: '€' },
-  { code: 'GBP', name: 'British Pound', symbol: '£' },
-  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
-  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
-  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
-  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
-  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
-  { code: 'ZAR', name: 'South African Rand', symbol: 'R' }
-];
+import ChartData from './ChartData';
+import { fetchHistoricalRates } from './GetRates';
+import { checkAndFetchDaily } from './DailyUpdater';
+import PeriodDropdown from './PeriodDropdown';
 
 const App = () => {
-  const [amount, setAmount] = useState(1);
+  const [amount, setAmount] = useState();  // Default value is 1
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('EUR');
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [chartLoading, setChartLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('conversionHistory');
     return saved ? JSON.parse(saved) : [];
   });
-  const [showHistory, setShowHistory] = useState(false); 
+  const [showHistory, setShowHistory] = useState(false);
+  const [historicalRates, setHistoricalRates] = useState([]);
+  const [availableCurrencies, setAvailableCurrencies] = useState([]);
 
-function toggleHistory() {
-  setShowHistory(prev => !prev);
-}
+  const isInitialRender = useRef(true);
 
-
+  // Fetch historical rates when app loads
   useEffect(() => {
-    const fetchData = async () => {
-      if (!amount || amount <= 0) return;
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(
-          `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch exchange rate');
-        }
-        const data = await response.json();
-        const convertedAmount = data.rates[toCurrency];
-        setResult(convertedAmount);
-
-        const newEntry = {
-          timestamp: new Date().toISOString(),
-          amount,
-          from: fromCurrency,
-          to: toCurrency,
-          result: convertedAmount,
-        };
-
-        const updatedHistory = [newEntry, ...history].slice(0, 20);
-        setHistory(updatedHistory);
-        localStorage.setItem('conversionHistory', JSON.stringify(updatedHistory));
-      } catch (error) {
-        console.error("API Error:", error);
-        setError(error.message);
-        setResult(null);
-      } finally {
-        setIsLoading(false);
+    const loadRates = async () => {
+      const storedRates = localStorage.getItem('historicalRates');
+      if (storedRates) {
+        const parsedRates = JSON.parse(storedRates);
+        setHistoricalRates(parsedRates);
+      } else {
+        await fetchInitialRates();
       }
     };
+    loadRates();
+  }, []);
 
-    const timeoutId = setTimeout(() => {
-      fetchData();
-    }, 1000);
+  const fetchInitialRates = async () => {
+    try {
+      const fetchedData = await fetchHistoricalRates('USD', 365);
+      setHistoricalRates(fetchedData);
+      localStorage.setItem('historicalRates', JSON.stringify(fetchedData));
+    } catch (error) {
+      console.error('Error fetching initial rates:', error);
+    }
+  };
 
-    return () => clearTimeout(timeoutId);
-  }, [amount, fromCurrency, toCurrency]);
+  useEffect(() => {
+    checkAndFetchDaily();
+  }, []);
+
+  // Update available currencies
+  useEffect(() => {
+    if (historicalRates.length > 0) {
+      const latest = historicalRates[historicalRates.length - 1];
+      if (latest?.rates) {
+        const currencies = Object.keys(latest.rates);
+        setAvailableCurrencies(currencies.sort());
+      }
+    }
+  }, [historicalRates]);
+
+  // Handle currency conversion when the Submit button is clicked
+  const handleConversion = () => {
+    if (!amount || amount <= 0 || historicalRates.length === 0) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const latestData = historicalRates[historicalRates.length - 1];
+      const fromRate = latestData.rates[fromCurrency];
+      const toRate = latestData.rates[toCurrency];
+
+      if (!fromRate || !toRate) {
+        throw new Error('Invalid currency selection');
+      }
+
+      const usdAmount = amount / fromRate;
+      const convertedAmount = usdAmount * toRate;
+
+      setResult(convertedAmount);
+
+      const newEntry = {
+        timestamp: new Date().toISOString(),
+        amount,
+        from: fromCurrency,
+        to: toCurrency,
+        result: convertedAmount,
+      };
+
+      const updatedHistory = [newEntry, ...history].slice(0, 20);
+      setHistory(updatedHistory);
+      localStorage.setItem('conversionHistory', JSON.stringify(updatedHistory));
+    } catch (err) {
+      console.error('Conversion Error:', err);
+      setError(err.message);
+      setResult(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleClearHistory = () => {
     setHistory([]);
     localStorage.removeItem('conversionHistory');
   };
-  function toggleHistory() {
+
+  const toggleHistory = () => {
     setShowHistory(prev => !prev);
-  }
+  };
+
+  const handlePeriodSelection = async (days) => {
+    console.log(`Selected period: ${days} days`);
+    setChartLoading(true);
+
+    try {
+      const fetchedData = await fetchHistoricalRates('USD', days);
+      setHistoricalRates(fetchedData);
+      localStorage.setItem('historicalRates', JSON.stringify(fetchedData));
+    } catch (error) {
+      console.error('Failed to fetch historical rates for selected period:', error);
+    } finally {
+      setChartLoading(false);
+    }
+  };
 
   return (
     <div className="App">
       <h1>Currency Converter</h1>
-      <div>
+
+      <div className="converter">
         <input
           type="number"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => setAmount(Number(e.target.value))}
+          min="0"
+          step="any"
         />
-        <select
-          value={fromCurrency}
-          onChange={(e) => setFromCurrency(e.target.value)}
-        >
-          {currencies.map((currency) => (
-            <option key={currency.code} value={currency.code}>
-              {currency.name} ({currency.code})
-            </option>
+        <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
+          {availableCurrencies.map(currency => (
+            <option key={currency} value={currency}>{currency}</option>
           ))}
         </select>
         <span> to </span>
-        <select
-          value={toCurrency}
-          onChange={(e) => setToCurrency(e.target.value)}
-        >
-          {currencies.map((currency) => (
-            <option key={currency.code} value={currency.code}>
-              {currency.name} ({currency.code})
-            </option>
+        <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)}>
+          {availableCurrencies.map(currency => (
+            <option key={currency} value={currency}>{currency}</option>
           ))}
         </select>
+        <button onClick={handleConversion} className="convert-button">
+          Convert
+        </button>
       </div>
 
-      {isLoading && <p>Loading...</p>}
+      {isLoading && <p>Loading conversion...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {result && <h2>Result: {result} {toCurrency}</h2>}
+      {result && <h2>Result: {result.toFixed(4)} {toCurrency}</h2>}
+
       <div className="history-section">
-  <button
-    onClick={toggleHistory}
-    className={`history-toggle-button ${showHistory ? 'active' : ''}`}
-  >
-    {showHistory ? 'Hide History' : 'Show History'}
-  </button>
+        <button onClick={toggleHistory} className={`history-toggle-button ${showHistory ? 'active' : ''}`}>
+          {showHistory ? 'Hide History' : 'Show History'}
+        </button>
 
-  {showHistory && (
-    <>
-      <h3>Recent Conversions</h3>
-      {history.length > 0 ? (
-        <>
-          <ul>
-            {history.map((entry, index) => (
-              <li key={index}>
-                {entry.amount} {entry.from} → {entry.result} {entry.to}
-                <br />
-                <small>{new Date(entry.timestamp).toLocaleString()}</small>
-              </li>
-            ))}
-          </ul>
-          <button onClick={handleClearHistory}>Clear History</button>
-        </>
-      ) : (
-        <p>No conversion history yet.</p>
-      )}
-    </>
-  )}
-</div>
+        {showHistory && (
+          <>
+            <h3>Recent Conversions</h3>
+            {history.length > 0 ? (
+              <ul>
+                {history.map((entry, index) => (
+                  <li key={index}>
+                    {entry.amount} {entry.from} → {entry.result.toFixed(4)} {entry.to}
+                    <br />
+                    <small>{new Date(entry.timestamp).toLocaleString()}</small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No conversion history yet.</p>
+            )}
+            <button onClick={handleClearHistory} className="clear-history-button">
+              Clear History
+            </button>
+          </>
+        )}
+      </div>
 
-      <GraphDisplay />
-      
-      
+      <PeriodDropdown historicalRates={historicalRates} onSelectPeriod={handlePeriodSelection} />
+
+      <ChartData 
+        historicalRates={historicalRates}
+        isLoading={chartLoading}
+      />
     </div>
   );
 };
