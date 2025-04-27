@@ -290,7 +290,11 @@ const App = () => {
   return (
     <Router>
       <div className="App">
-        <h1>Currency Converter</h1>
+      
+    <h1 className="app-title">
+     <span className="title-gradient">Currency Converter</span>
+    <span className="title-icon">💱</span>
+  </h1>
         <nav className="main-nav">
           <Link to="/">Home</Link>
           <Link to="/favorites">Favorites</Link>
