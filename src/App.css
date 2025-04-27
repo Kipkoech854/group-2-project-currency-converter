@@ -132,15 +132,50 @@ h1 {
 
 .favorite-button {
   background-color: transparent;
-  color: #ccc;
-  font-size: 1.5rem;
-  padding: 0 0.5rem;
+  color: #6b8e23;  /* Olive green */
+  font-size: 2rem;
+  padding: 0 0.75rem;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  
+  /* Permanent border styles */
+  border: 2px solid #d4d4d4;  /* Light gray border */
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);  /* Subtle inner shadow */
+}
+
+.favorite-button:hover {
+  color: #556b2f;
+  transform: scale(1.1);
+  border-color: #9cbb22;  /* Match the button color */
 }
 
 .favorite-button.active {
-  color: gold;
+  color: #ffd700;
+  border-color: #ffd700;  /* Gold border when active */
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  animation: pulse 0.5s ease;
+}
+
+.favorite-button.active:hover {
+  color: #ffdf00;
+  border-color: #ffdf00;  /* Brighter gold border on hover */
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .result-display {
@@ -503,4 +538,106 @@ h2 {
   .title-icon {
     font-size: 2rem;
   }
+}
+/* Chart styles */
+.chart-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.currency-selectors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.currency-selectors select {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.range-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.range-selector button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.range-selector button.active {
+  background: #4a6fa5;
+  color: white;
+  border-color: #4a6fa5;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+.chart-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-controls {
+  margin-bottom: 20px;
+}
+
+.currency-selectors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.range-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.range-buttons button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.range-buttons button.active {
+  background: #4a6fa5;
+  color: white;
+  border-color: #4a6fa5;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
 }

@@ -1,24 +1,28 @@
-import { fetchHistoricalRates } from './GetRates';
+import { ref, onValue, set } from "firebase/database";
+import { db } from "./firebase"; 
+import { fetchHistoricalRates } from "./yourFetchFunctions"; 
 
 export const checkAndFetchDaily = async () => {
-  const lastChecked = localStorage.getItem('lastUpdateCheck');
-  const now = new Date();
-
-  if (lastChecked) {
-    const lastCheckedDate = new Date(lastChecked);
-    const diffInHours = (now - lastCheckedDate) / (1000 * 60 * 60);
-    if (diffInHours < 24) {
-      // Already checked in the last 24 hours, do nothing
-      return;
+  const today = new Date().toISOString().split('T')[0];
+  const ratesRef = ref(db, 'historicalRates');
+  
+  onValue(ratesRef, async (snapshot) => {
+    const currentRates = snapshot.val() || [];
+    
+    // Check if we already have today's rates
+    const hasToday = currentRates.some(rate => rate.date === today);
+    
+    if (!hasToday) {
+      try {
+        console.log('Fetching daily update...');
+        const newData = await fetchHistoricalRates(1, currentRates);
+        if (newData.length > 0) {
+          await set(ratesRef, [...newData, ...currentRates.slice(0, 364)]);
+          console.log('Daily update successful');
+        }
+      } catch (error) {
+        console.error('Daily update failed:', error);
+      }
     }
-  }
-
-  try {
-    const existingData = JSON.parse(localStorage.getItem('historicalRates')) || [];
-    const updatedData = await fetchHistoricalRates(365, existingData);
-    localStorage.setItem('historicalRates', JSON.stringify(updatedData));
-    localStorage.setItem('lastUpdateCheck', now.toISOString());
-  } catch (error) {
-    console.error('Daily update check failed:', error);
-  }
+  });
 };
